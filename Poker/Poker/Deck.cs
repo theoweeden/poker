@@ -18,5 +18,22 @@ namespace Poker
             }
         }
 
+        public void Shuffle()
+        {
+            Shuffle(100);
+        }
+        public void Shuffle(int swaps)
+        {
+            Random r = new Random();
+            for(int i = 0; i < swaps; i++)
+            {
+                var j = r.Next(CardDeck.Count);
+                var k = r.Next(CardDeck.Count);
+
+                var temp = CardDeck[j];
+                CardDeck[j] = CardDeck[k];
+                CardDeck[k] = temp;
+            }
+        }
     }
 }
