@@ -6,7 +6,13 @@ namespace Poker
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var deck = new Deck();
+            
+            deck.Shuffle();
+            foreach (var c in deck.Cards)
+            {
+                Console.WriteLine(c.ToString());
+            }
         }
     }
 }
