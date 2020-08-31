@@ -16,7 +16,7 @@ namespace Poker
 
         public override string ToString()
         {
-            return $"{c.Number} of {c.Suit}";
+            return $"{Number} of {Suit}";
         }
     }
 
