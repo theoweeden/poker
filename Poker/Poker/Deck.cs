@@ -9,6 +9,7 @@ namespace Poker
         public List<Card> Cards { get; set; }
         public Deck()
         {
+            Cards = new List<Card>();
             foreach (var suit in (Suit[])Enum.GetValues(typeof(Suit)))
             {
                 foreach (var n in (Number[])Enum.GetValues(typeof(Number)))
