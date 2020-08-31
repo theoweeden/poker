@@ -13,6 +13,11 @@ namespace Poker
             Number = number;
             Suit = suit;
         }
+
+        public override string ToString()
+        {
+            return $"{c.Number} of {c.Suit}";
+        }
     }
 
     public enum Number
