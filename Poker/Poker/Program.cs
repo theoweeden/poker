@@ -13,6 +13,7 @@ namespace Poker
             {
                 Console.WriteLine(c.ToString());
             }
+            Console.WriteLine(deck.Cards.Count);
         }
     }
 }
