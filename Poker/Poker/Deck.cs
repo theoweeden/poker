@@ -6,14 +6,14 @@ namespace Poker
 {
     class Deck
     {
-        public List<Card> CardDeck { get; set; }
+        public List<Card> Cards { get; set; }
         public Deck()
         {
             foreach (var suit in (Suit[])Enum.GetValues(typeof(Suit)))
             {
                 foreach (var n in (Number[])Enum.GetValues(typeof(Number)))
                 {
-                    CardDeck.Add(new Card(n, suit));
+                    Cards.Add(new Card(n, suit));
                 }
             }
         }
@@ -27,12 +27,12 @@ namespace Poker
             Random r = new Random();
             for(int i = 0; i < swaps; i++)
             {
-                var j = r.Next(CardDeck.Count);
-                var k = r.Next(CardDeck.Count);
+                var j = r.Next(Cards.Count);
+                var k = r.Next(Cards.Count);
 
-                var temp = CardDeck[j];
-                CardDeck[j] = CardDeck[k];
-                CardDeck[k] = temp;
+                var temp = Cards[j];
+                Cards[j] = Cards[k];
+                Cards[k] = temp;
             }
         }
     }
