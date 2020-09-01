@@ -42,7 +42,7 @@ namespace Poker
                     highestSuits = WinType.Straight;
                 }
 
-                var highest = (highestSuits > highestCombo) ? highestSuits : highestCombo;
+                var highest = ((int)highestSuits < (int)highestCombo) ? highestSuits : highestCombo;
 
                 highestWins.Add((hand, highest));
             }
