@@ -39,7 +39,7 @@ namespace Poker
                         if (s.highestValue == Number.Ace) return s.straight;
                         else return false;
                     })) highestCombo = WinType.RoyalFlush;
-                    if (suits.Where(x => x.Count() >= 5).Any(x => StraightCheck(x.ToList()).straight)) highestCombo = WinType.StraightFlush;
+                    else if (suits.Where(x => x.Count() >= 5).Any(x => StraightCheck(x.ToList()).straight)) highestCombo = WinType.StraightFlush;
                     else highestSuits = WinType.Flush;
                 }
                 else if(StraightCheck(pool).straight)
@@ -81,10 +81,10 @@ namespace Poker
                 return (diff, group);
             }).GroupBy(x => x.group).Select(x => (count: x.Count(), value: x.Last().diff.number)).OrderBy(x=>x.count).ToList();
 
-            if (straightLengths.Any(x => x.count >= 5)) return (true, straightLengths.Last(x => x.count >= 5).value);
-
             if (straightLengths.Last().count >= 4 && straightLengths.Last().value == Number.King && pool.Any(x => x.Number == Number.Ace)) 
                 return (true, Number.Ace);
+
+            if (straightLengths.Any(x => x.count >= 5)) return (true, straightLengths.Last(x => x.count >= 5).value);
 
             return (false, pool.Max(x => x.Number));
         }
