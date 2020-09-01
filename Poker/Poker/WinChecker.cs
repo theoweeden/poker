@@ -48,7 +48,7 @@ namespace Poker
             }
 
             if (!highestWins.Any()) return (null, WinType.HighCard);
-            else return highestWins.OrderBy(x => x.WinType).Last();
+            else return highestWins.OrderBy(x => x.WinType).First();
         }
 
         private static WinType ComboCheck(List<Card> pool)
