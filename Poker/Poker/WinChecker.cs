@@ -7,7 +7,7 @@ namespace Poker
 {
     class WinChecker
     {
-        public bool WinCheck(List<Card> table, List<Card> playerHand, List<List<Card>> otherHands = null)
+        public static bool WinCheck(List<Card> table, List<Card> playerHand, List<List<Card>> otherHands = null)
         {
             var hands = new List<List<Card>>();
             hands.AddRange(otherHands);
@@ -15,8 +15,9 @@ namespace Poker
             return WinCheck(table, hands).Hand == playerHand;
         }
 
-        public (List<Card> Hand, WinType WinType) WinCheck(List<Card> table, List<List<Card>> hands)
+        public static (List<Card> Hand, WinType WinType) WinCheck(List<Card> table, List<List<Card>> hands)
         {
+            var highestWins = new List<(List<Card> Hand, WinType WinType)>();
             foreach(var hand in hands)
             {
                 var pool = new List<Card>();
@@ -28,18 +29,29 @@ namespace Poker
                 WinType highestCombo = ComboCheck(pool);
 
                 //suits test
-                var suits = pool.GroupBy(x => x.Suit).Select(x => (x.Key, count: x.Count())).OrderBy(x => x.count).ThenBy(x => x.Key);
-                WinType highestSuits;
+                var suits = pool.GroupBy(x => x.Suit).OrderBy(x => x.Count()).ThenBy(x => x.Key);
+                WinType highestSuits = WinType.HighCard;
 
-                if (suits.Any(x => x.count == 5)) highestCombo = WinType.Flush;
+                if (suits.Any(x => x.Count() == 5))
+                {
+                    if (suits.Where(x => x.Count() == 5).Any(x => StraightCheck(x.Select(y => y).ToList()).straight)) highestCombo = WinType.StraightFlush;
+                    else highestSuits = WinType.Flush;
+                }
+                else if(StraightCheck(pool).straight)
+                {
+                    highestSuits = WinType.Straight;
+                }
 
-                //straight test
+                var highest = (highestSuits > highestCombo) ? highestSuits : highestCombo;
+
+                highestWins.Add((hand, highest));
             }
 
-            return (null, WinType.HighCard);
+            if (!highestWins.Any()) return (null, WinType.HighCard);
+            else return highestWins.OrderBy(x => x.WinType).Last();
         }
 
-        private WinType ComboCheck(List<Card> pool)
+        private static WinType ComboCheck(List<Card> pool)
         {
             var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderBy(x => x.count).ThenBy(x => x.Key);
 
@@ -52,31 +64,24 @@ namespace Poker
             return WinType.HighCard;
         }
 
-        private bool StraightCheck(List<Card> pool)
+        public static (bool straight, Number highestValue) StraightCheck(List<Card> pool)
         {
-            var orderedPool = pool.OrderBy(x => x.Number).ToList();
-            int counter = 1;
-            Number last = pool.First().Number;
-            for (int i = 1; i < orderedPool.Count; i++)
+            var orderedPool = pool.GroupBy(x=>x.Number).OrderBy(x => x.Key).ToList();
+            var diffs = orderedPool.Zip(orderedPool.Skip(1), (a, b) => (diff: b.Key - a.Key, number: b.Key));
+            
+            int last = diffs.First().diff;
+            var group = 0;
+            var straightLengths = diffs.Select(diff =>
             {
-                var diff = orderedPool[i].Number - last;
-                if (diff == 0) continue;
-                else if (diff == 1)
-                {
-                    counter++;
-                }
-                else if (diff != 1)
-                {
-                    counter = 1;
-                }
-                last = orderedPool[i].Number;
-            }
+                if (diff.diff != last) group++;
+                return (diff, group);
+            }).GroupBy(x => x.group).Select(x => (count: x.Count(), value: x.Last().diff.number)).OrderBy(x=>x.count).ToList();
 
-            if (counter >= 5) return true;
+            if (straightLengths.Any(x => x.count >= 4)) return (true, straightLengths.Last(x => x.count >= 4).value);
 
-            if (counter >= 4 && orderedPool.Last().Number == Number.King && orderedPool.Any(x => x.Number == Number.Ace)) return true;
+            if (straightLengths.Last().count >= 3 && straightLengths.Last().value == Number.King && pool.Any(x => x.Number == Number.Ace)) return (true, Number.Ace);
 
-            return false;
+            return (false, pool.Max(x => x.Number));
         }
     }
 
