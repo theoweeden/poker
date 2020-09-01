@@ -32,9 +32,14 @@ namespace Poker
                 var suits = pool.GroupBy(x => x.Suit).OrderBy(x => x.Count()).ThenBy(x => x.Key);
                 WinType highestSuits = WinType.HighCard;
 
-                if (suits.Any(x => x.Count() == 5))
+                if (suits.Any(x => x.Count() >= 5))
                 {
-                    if (suits.Where(x => x.Count() == 5).Any(x => StraightCheck(x.Select(y => y).ToList()).straight)) highestCombo = WinType.StraightFlush;
+                    if (suits.Where(x => x.Count() >= 5).Any(x => { 
+                        var s = StraightCheck(x.ToList());
+                        if (s.highestValue == Number.Ace) return s.straight;
+                        else return false;
+                    })) highestCombo = WinType.RoyalFlush;
+                    if (suits.Where(x => x.Count() >= 5).Any(x => StraightCheck(x.ToList()).straight)) highestCombo = WinType.StraightFlush;
                     else highestSuits = WinType.Flush;
                 }
                 else if(StraightCheck(pool).straight)
@@ -79,7 +84,8 @@ namespace Poker
 
             if (straightLengths.Any(x => x.count >= 4)) return (true, straightLengths.Last(x => x.count >= 4).value);
 
-            if (straightLengths.Last().count >= 3 && straightLengths.Last().value == Number.King && pool.Any(x => x.Number == Number.Ace)) return (true, Number.Ace);
+            if (straightLengths.Last().count >= 3 && straightLengths.Last().value == Number.King && pool.Any(x => x.Number == Number.Ace)) 
+                return (true, Number.Ace);
 
             return (false, pool.Max(x => x.Number));
         }
