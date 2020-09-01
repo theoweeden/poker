@@ -74,17 +74,16 @@ namespace Poker
             var orderedPool = pool.GroupBy(x=>x.Number).OrderBy(x => x.Key).ToList();
             var diffs = orderedPool.Zip(orderedPool.Skip(1), (a, b) => (diff: b.Key - a.Key, number: b.Key));
             
-            int last = diffs.First().diff;
             var group = 0;
             var straightLengths = diffs.Select(diff =>
             {
-                if (diff.diff != last) group++;
+                if (diff.diff != 1) group++;
                 return (diff, group);
             }).GroupBy(x => x.group).Select(x => (count: x.Count(), value: x.Last().diff.number)).OrderBy(x=>x.count).ToList();
 
-            if (straightLengths.Any(x => x.count >= 4)) return (true, straightLengths.Last(x => x.count >= 4).value);
+            if (straightLengths.Any(x => x.count >= 5)) return (true, straightLengths.Last(x => x.count >= 5).value);
 
-            if (straightLengths.Last().count >= 3 && straightLengths.Last().value == Number.King && pool.Any(x => x.Number == Number.Ace)) 
+            if (straightLengths.Last().count >= 4 && straightLengths.Last().value == Number.King && pool.Any(x => x.Number == Number.Ace)) 
                 return (true, Number.Ace);
 
             return (false, pool.Max(x => x.Number));
