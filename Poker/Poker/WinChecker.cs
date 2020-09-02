@@ -72,8 +72,9 @@ namespace Poker
         public static (bool straight, Number highestValue) StraightCheck(List<Card> pool)
         {
             var orderedPool = pool.GroupBy(x=>x.Number).OrderBy(x => x.Key).ToList();
-            var diffs = orderedPool.Zip(orderedPool.Skip(1), (a, b) => (diff: b.Key - a.Key, number: b.Key));
-            
+            var diffs = orderedPool.Zip(orderedPool.Skip(1), (a, b) => (diff: b.Key - a.Key, number: b.Key)).ToList();
+            diffs.Insert(0, (diff: 0, number: orderedPool[0].Key));
+
             var group = 0;
             var straightLengths = diffs.Select(diff =>
             {
