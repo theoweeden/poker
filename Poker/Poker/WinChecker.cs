@@ -12,54 +12,137 @@ namespace Poker
             var hands = new List<List<Card>>();
             hands.AddRange(otherHands);
             hands.Add(playerHand);
-            return WinCheck(table, hands).Hand == playerHand;
+            return WinCheck(table, hands).Hands.Contains(playerHand);
         }
 
-        public static (List<Card> Hand, WinType WinType) WinCheck(List<Card> table, List<List<Card>> hands)
+        public static (List<List<Card>> Hands, WinType WinType) WinCheck(List<Card> table, List<List<Card>> hands)
         {
-            var highestWins = new List<(List<Card> Hand, WinType WinType)>();
+            var highestWins = new List<(List<Card> Hand, WinType WinType, List<Number> Kickers)>();
             foreach(var hand in hands)
             {
                 var pool = new List<Card>(table);
                 pool.AddRange(hand);
 
-                var potentialFlushes = pool.GroupBy(x => x.Suit).OrderBy(x => x.Count()).ThenBy(x => x.Key).Where(x => x.Count() >= 5);
-                var highest = WinType.HighCard;
+                var potentialFlushes = pool.GroupBy(x => x.Suit).Where(x => x.Count() >= 5).Select(x => x.OrderByDescending(y=>y.Number));
+                var highestWin = WinType.HighCard;
+                var kickers = new List<Number>();
 
                 if (potentialFlushes.Any())
                 {
-                    var straightChecks = potentialFlushes.Select(x => StraightCheck(x.ToList()));
+                    var straightChecks = potentialFlushes.Select(x => StraightCheck(x.ToList())).OrderByDescending(x => x.highestValue);
 
-                    if (straightChecks.Any(x => x.highestValue == Number.Ace && x.straight)) highest = WinType.RoyalFlush;
-                    else if (straightChecks.Any(x => x.straight)) highest = WinType.StraightFlush;
-                    else highest = WinType.Flush;
+                    if (straightChecks.Any(x => x.highestValue == Number.Ace && x.straight))
+                    {
+                        highestWin = WinType.RoyalFlush;
+                        kickers = new List<Number> { Number.Ace };
+                    }
+                    else if (straightChecks.Any(x => x.straight))
+                    {
+                        highestWin = WinType.StraightFlush;
+                        kickers = new List<Number> { straightChecks.First(x => x.straight).highestValue };
+                    }
+                    else { 
+                        highestWin = WinType.Flush;
+                        kickers = new List<Number> { potentialFlushes.First().First().Number };
+                    }
                 }
-                else if(StraightCheck(pool).straight)
+                else
                 {
-                    highest = WinType.Straight;
+                    var straightCheck = StraightCheck(pool);
+                    if (straightCheck.straight)
+                    {
+                        highestWin = WinType.Straight;
+                        kickers = new List<Number> { straightCheck.highestValue };
+                    }
                 }
 
-                var highestCombo = ComboCheck(pool);
-                highest = (highest < highestCombo) ? highest : highestCombo;
+                var (highestCombo, comboKickers) = ComboCheck(pool);
+                if (highestWin >= highestCombo)
+                {
+                    highestWin = highestCombo;
+                    kickers = comboKickers;
+                }
 
-                highestWins.Add((hand, highest));
+                highestWins.Add((hand, highestWin, kickers));
             }
 
             if (!highestWins.Any()) return (null, WinType.HighCard);
-            else return highestWins.OrderBy(x => x.WinType).First();
+            
+            highestWins = highestWins.GroupBy(x => x.WinType).OrderBy(x => x.Key).First().ToList();
+            if (highestWins.Count == 1) return highestWins.Select(x => (new List<List<Card>> { x.Hand }, x.WinType)).Single();
+            else
+            {
+                var kickerCount = highestWins.Max(x => x.Kickers.Count);
+                for(int i = 0; i< kickerCount; i++)
+                {
+                    var highestKicker = highestWins.Max(x => x.Kickers[i]);
+                    highestWins = highestWins.Where(x => x.Kickers[i] == highestKicker).ToList();
+
+                    if (highestWins.Count == 1) return highestWins.Select(x => (new List<List<Card>> { x.Hand }, x.WinType)).Single();
+                }
+            }
+
+            return (highestWins.Select(x => x.Hand).ToList(), highestWins.First().WinType);
         }
 
-        private static WinType ComboCheck(List<Card> pool)
+        private static (WinType WinType, List<Number> Kickers) ComboCheck(List<Card> pool)
         {
-            var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderBy(x => x.count).ThenBy(x => x.Key);
+            var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderByDescending(x => x.count).ThenByDescending(x => x.Key);
 
-            if (combos.Any(x => x.count == 4)) return WinType.FourOfAKind;
-            else if (combos.Any(x => x.count == 3) && combos.Any(x => x.count == 2)) return WinType.FullHouse;
-            else if (combos.Any(x => x.count == 3)) return WinType.ThreeOfAKind;
-            else if (combos.Count(x => x.count == 2) >= 2) return WinType.TwoPair;
-            else if (combos.Any(x => x.count == 2)) return WinType.Pair;
+            Number? FirstCombo(int count)
+            {
+                if (!combos.Any(x => x.count >= count)) return null;
+                return combos.FirstOrDefault(x => x.count == count).Key;
+            }
 
-            return WinType.HighCard;
+            Number? SecondCombo(int count, Number exclude)
+            {
+                if (!combos.Any(x => x.count >= count && x.Key != exclude)) return null;
+                return combos.FirstOrDefault(x => x.count == count && x.Key != exclude).Key;
+            }
+
+            IEnumerable<Number> TakeFromPool(int count, Number exclude)
+            {
+                return pool.Where(x => x.Number != exclude).Select(x => x.Number).OrderBy(x => x).Take(count);
+            }
+
+            if (FirstCombo(4).HasValue)
+            {
+                var kickers = new List<Number> { FirstCombo(4).Value };
+                kickers.AddRange(TakeFromPool(1, kickers.First()));
+                return (WinType.FourOfAKind, kickers);
+            }
+            else if (FirstCombo(3).HasValue)
+            {
+                var kickers = new List<Number> { FirstCombo(3).Value };
+                if (SecondCombo(2, kickers.First()).HasValue)
+                {
+                    kickers.Add(SecondCombo(2, kickers.First()).Value);
+                    return (WinType.FullHouse, kickers);
+                }
+                else
+                {
+                    kickers.AddRange(TakeFromPool(2, kickers.First()));
+                    return (WinType.ThreeOfAKind, kickers);
+                }
+            }
+            else if (FirstCombo(2).HasValue)
+            {
+                var kickers = new List<Number> { FirstCombo(2).Value };
+                if (SecondCombo(2, kickers.First()).HasValue)
+                {
+                    kickers.Add(SecondCombo(2, kickers.First()).Value);
+                    kickers.Add(pool.OrderBy(x => x.Number).First(x => !kickers.Contains(x.Number)).Number);
+                    return (WinType.TwoPair, kickers);
+                }
+                else
+                {
+                    kickers.AddRange(TakeFromPool(3, kickers.First()));
+                    return (WinType.Pair, kickers);
+                }
+            };
+
+            return (WinType.HighCard, pool.OrderByDescending(x => x.Number).Select(x=>x.Number).Take(5).ToList());
         }
 
         public static (bool straight, Number highestValue) StraightCheck(List<Card> pool)
