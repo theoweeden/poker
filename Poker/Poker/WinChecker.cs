@@ -20,31 +20,27 @@ namespace Poker
             var highestWins = new List<(List<Card> Hand, WinType WinType)>();
             foreach(var hand in hands)
             {
-                var pool = new List<Card>();
-                pool.AddRange(table);
+                var pool = new List<Card>(table);
                 pool.AddRange(hand);
 
-                //combos test
-                WinType highestCombo = ComboCheck(pool);
-
-                //suits test
                 var potentialFlushes = pool.GroupBy(x => x.Suit).OrderBy(x => x.Count()).ThenBy(x => x.Key).Where(x => x.Count() >= 5);
-                WinType highestSuits = WinType.HighCard;
+                var highest = WinType.HighCard;
 
                 if (potentialFlushes.Any())
                 {
                     var straightChecks = potentialFlushes.Select(x => StraightCheck(x.ToList()));
 
-                    if (straightChecks.Any(x => x.highestValue == Number.Ace && x.straight)) highestCombo = WinType.RoyalFlush;
-                    else if (straightChecks.Any(x => x.straight)) highestCombo = WinType.StraightFlush;
-                    else highestSuits = WinType.Flush;
+                    if (straightChecks.Any(x => x.highestValue == Number.Ace && x.straight)) highest = WinType.RoyalFlush;
+                    else if (straightChecks.Any(x => x.straight)) highest = WinType.StraightFlush;
+                    else highest = WinType.Flush;
                 }
                 else if(StraightCheck(pool).straight)
                 {
-                    highestSuits = WinType.Straight;
+                    highest = WinType.Straight;
                 }
 
-                var highest = (highestSuits < highestCombo) ? highestSuits : highestCombo;
+                var highestCombo = ComboCheck(pool);
+                highest = (highest < highestCombo) ? highest : highestCombo;
 
                 highestWins.Add((hand, highest));
             }
