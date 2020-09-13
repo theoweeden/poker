@@ -49,5 +49,13 @@ namespace Poker
 
             return hands;
         }
+
+        public void Remove(Card card)
+        {
+            var tempCards = Cards.Where(x => x.Number != card.Number || x.Suit != card.Suit).ToList();
+
+            Cards.Clear();
+            foreach (var c in tempCards) Cards.Push(c);
+        }
     }
 }
