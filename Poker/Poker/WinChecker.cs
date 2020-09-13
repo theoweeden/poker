@@ -29,17 +29,15 @@ namespace Poker
                 WinType highestCombo = ComboCheck(pool);
 
                 //suits test
-                var suits = pool.GroupBy(x => x.Suit).OrderBy(x => x.Count()).ThenBy(x => x.Key);
+                var potentialFlushes = pool.GroupBy(x => x.Suit).OrderBy(x => x.Count()).ThenBy(x => x.Key).Where(x => x.Count() >= 5);
                 WinType highestSuits = WinType.HighCard;
 
-                if (suits.Any(x => x.Count() >= 5))
+                if (potentialFlushes.Any())
                 {
-                    if (suits.Where(x => x.Count() >= 5).Any(x => { 
-                        var s = StraightCheck(x.ToList());
-                        if (s.highestValue == Number.Ace) return s.straight;
-                        else return false;
-                    })) highestCombo = WinType.RoyalFlush;
-                    else if (suits.Where(x => x.Count() >= 5).Any(x => StraightCheck(x.ToList()).straight)) highestCombo = WinType.StraightFlush;
+                    var straightChecks = potentialFlushes.Select(x => StraightCheck(x.ToList()));
+
+                    if (straightChecks.Any(x => x.highestValue == Number.Ace && x.straight)) highestCombo = WinType.RoyalFlush;
+                    else if (straightChecks.Any(x => x.straight)) highestCombo = WinType.StraightFlush;
                     else highestSuits = WinType.Flush;
                 }
                 else if(StraightCheck(pool).straight)
