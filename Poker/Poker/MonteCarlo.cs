@@ -6,6 +6,26 @@ namespace Poker
 {
     class MonteCarlo
     {
+        public static List<(List<Card> hand, double probability)> CalculateAllProbabilities(int iterations = 1000)
+        {
+            var deck = new Deck();
+            var output = new List<(List<Card> hand, double probability)>();
+            foreach(var c1 in deck.Cards)
+            {
+                foreach (var c2 in deck.Cards)
+                {
+                    var hand = new List<Card>{ c1, c2 };
+                    var p = CalculateProbability(hand, iterations);
+
+                    Console.WriteLine($"{c1.ToString()}, {c2.ToString()} - {p}");
+
+                    output.Add((hand, p));
+                }
+            }
+
+            return output;
+        }
+
         public static double CalculateProbability(List<Card> Hand, int iterations = 1000)
         {
             double total = 0;
