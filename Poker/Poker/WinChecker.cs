@@ -25,7 +25,6 @@ namespace Poker
                 pool.AddRange(hand);
 
                 //combos test
-                var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderBy(x=>x.count).ThenBy(x => x.Key);
                 WinType highestCombo = ComboCheck(pool);
 
                 //suits test
@@ -45,7 +44,7 @@ namespace Poker
                     highestSuits = WinType.Straight;
                 }
 
-                var highest = ((int)highestSuits < (int)highestCombo) ? highestSuits : highestCombo;
+                var highest = (highestSuits < highestCombo) ? highestSuits : highestCombo;
 
                 highestWins.Add((hand, highest));
             }
