@@ -158,8 +158,8 @@ namespace Poker
                 return (diff, group);
             }).GroupBy(x => x.group).Select(x => (count: x.Count(), value: x.Last().diff.number)).OrderBy(x=>x.count).ToList();
 
-            if (straightLengths.Last().count >= 4 && straightLengths.Last().value == Number.King && pool.Any(x => x.Number == Number.Ace)) 
-                return (true, Number.Ace);
+            if (straightLengths.Any(x => x.count >= 4 && x.value == Number.Five) && pool.Any(x => x.Number == Number.Ace)) 
+                return (true, Number.Five);
 
             if (straightLengths.Any(x => x.count >= 5)) return (true, straightLengths.Last(x => x.count >= 5).value);
 

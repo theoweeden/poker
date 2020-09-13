@@ -22,8 +22,7 @@ namespace Poker
 
     public enum Number
     {
-        Ace = 1,
-        Two,
+        Two = 2,
         Three,
         Four,
         Five,
@@ -35,6 +34,7 @@ namespace Poker
         Jack,
         Queen,
         King,
+        Ace,
     }
 
     public enum Suit
