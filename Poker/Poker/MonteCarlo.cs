@@ -26,7 +26,7 @@ namespace Poker
             deck.Shuffle();
 
             var table = deck.DealHand(5);
-            var hands = deck.DealHands(7, 2);
+            var hands = deck.DealHands(3, 2);
             
             return WinChecker.WinCheck(table, Hand, hands);
         }

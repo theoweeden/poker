@@ -13,7 +13,7 @@ namespace Poker
                 new Card(Number.Ace, Suit.Hearts),
             };
 
-            var p = MonteCarlo.CalculateProbability(hand, 1000);
+            var p = MonteCarlo.CalculateProbability(hand, 10000);
 
             Console.WriteLine(p);
         }
