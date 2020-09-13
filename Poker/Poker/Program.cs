@@ -20,7 +20,7 @@ namespace Poker
 
         static void TestHand()
         {
-            var table2 = new List<Card>()
+            var table = new List<Card>()
             {
                 new Card(Number.Ace, Suit.Diamonds),
                 new Card(Number.Two, Suit.Diamonds),
@@ -29,7 +29,7 @@ namespace Poker
                 new Card(Number.Five, Suit.Diamonds),
             };
 
-            var hands2 = new List<List<Card>>()
+            var hands = new List<List<Card>>()
             {
                 new List<Card>()
                 {
@@ -38,10 +38,15 @@ namespace Poker
                 }
             };
 
-            var winner2 = WinChecker.WinCheck(table2, hands2);
+            TestHand(table, hands);
+        }
 
-            Console.WriteLine(winner2.WinType);
-            foreach (var h in winner2.Hands)
+        static void TestHand(List<Card> Table, List<List<Card>> Hands)
+        {
+            var winner = WinChecker.WinCheck(Table, Hands);
+
+            Console.WriteLine(winner.WinType);
+            foreach (var h in winner.Hands)
             {
                 foreach (var c in h)
                 {
@@ -49,7 +54,7 @@ namespace Poker
                 }
                 Console.WriteLine();
             }
-            foreach (var c in table2)
+            foreach (var c in Table)
             {
                 Console.WriteLine(c.ToString());
             }
