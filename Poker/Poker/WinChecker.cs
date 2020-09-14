@@ -121,55 +121,49 @@ namespace Poker
         {
             var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderByDescending(x => x.count).ThenByDescending(x => x.Key);
 
-            Rank? FirstCombo(int count)
+            Rank? GetCombo(int count, Rank? exclude = null)
             {
-                if (!combos.Any(x => x.count >= count)) return null;
-                return combos.FirstOrDefault(x => x.count == count).Key;
+                if (!combos.Any(x => x.count >= count && (exclude == null || x.Key != exclude))) return null;
+                return combos.FirstOrDefault(x => x.count == count && (exclude == null || x.Key != exclude)).Key;
             }
 
-            Rank? SecondCombo(int count, Rank exclude)
+            IEnumerable<Rank> TakeFromPool(int count, List<Rank> exclude)
             {
-                if (!combos.Any(x => x.count >= count && x.Key != exclude)) return null;
-                return combos.FirstOrDefault(x => x.count == count && x.Key != exclude).Key;
+                return pool.Where(x => !exclude.Contains(x.Number)).Select(x => x.Number).OrderBy(x => x).Take(count);
             }
 
-            IEnumerable<Rank> TakeFromPool(int count, Rank exclude)
+            if (GetCombo(4).HasValue)
             {
-                return pool.Where(x => x.Number != exclude).Select(x => x.Number).OrderBy(x => x).Take(count);
-            }
-
-            if (FirstCombo(4).HasValue)
-            {
-                var kickers = new List<Rank> { FirstCombo(4).Value };
-                kickers.AddRange(TakeFromPool(1, kickers.First()));
+                var kickers = new List<Rank> { GetCombo(4).Value };
+                kickers.AddRange(TakeFromPool(1, kickers));
                 return (WinType.FourOfAKind, kickers);
             }
-            else if (FirstCombo(3).HasValue)
+            else if (GetCombo(3).HasValue)
             {
-                var kickers = new List<Rank> { FirstCombo(3).Value };
-                if (SecondCombo(2, kickers.First()).HasValue)
+                var kickers = new List<Rank> { GetCombo(3).Value };
+                if (GetCombo(2, kickers.First()).HasValue)
                 {
-                    kickers.Add(SecondCombo(2, kickers.First()).Value);
+                    kickers.Add(GetCombo(2, kickers.First()).Value);
                     return (WinType.FullHouse, kickers);
                 }
                 else
                 {
-                    kickers.AddRange(TakeFromPool(2, kickers.First()));
+                    kickers.AddRange(TakeFromPool(2, kickers));
                     return (WinType.ThreeOfAKind, kickers);
                 }
             }
-            else if (FirstCombo(2).HasValue)
+            else if (GetCombo(2).HasValue)
             {
-                var kickers = new List<Rank> { FirstCombo(2).Value };
-                if (SecondCombo(2, kickers.First()).HasValue)
+                var kickers = new List<Rank> { GetCombo(2).Value };
+                if (GetCombo(2, kickers.First()).HasValue)
                 {
-                    kickers.Add(SecondCombo(2, kickers.First()).Value);
-                    kickers.Add(pool.OrderBy(x => x.Number).First(x => !kickers.Contains(x.Number)).Number);
+                    kickers.Add(GetCombo(2, kickers.First()).Value);
+                    kickers.AddRange(TakeFromPool(1, kickers));
                     return (WinType.TwoPair, kickers);
                 }
                 else
                 {
-                    kickers.AddRange(TakeFromPool(3, kickers.First()));
+                    kickers.AddRange(TakeFromPool(3, kickers));
                     return (WinType.Pair, kickers);
                 }
             };
