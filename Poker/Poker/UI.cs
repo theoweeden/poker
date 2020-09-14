@@ -48,23 +48,23 @@ namespace Poker
             return input;
         }
 
+        static T InputEnum<T>(string question) where T : Enum
+        {
+            T t;
+            do
+            {    
+                t = (T)(object)InputNumber(question);
+            } while (!Enum.IsDefined(typeof(T), t));
+            return t;
+        }
+
         static Card InputCard(string titleLine = null)
         {
             if (!string.IsNullOrEmpty(titleLine)) Console.WriteLine(titleLine);
             Console.WriteLine("");
             
-            Suit suit;
-            Rank rank;
-
-            do
-            {
-                suit = (Suit)InputNumber(askSuit);
-            } while (!Enum.IsDefined(typeof(Suit), suit));
-
-            do
-            {
-                rank = (Rank)InputNumber(askRank);
-            } while (!Enum.IsDefined(typeof(Rank), rank));
+            var suit = InputEnum<Suit>(askSuit);
+            var rank = InputEnum<Rank>(askRank);
             
             Console.WriteLine("");
 
