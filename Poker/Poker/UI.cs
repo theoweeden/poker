@@ -51,9 +51,19 @@ namespace Poker
         {
             if (!string.IsNullOrEmpty(titleLine)) Console.WriteLine(titleLine);
             Console.WriteLine("");
+            
+            Suit suit;
+            Number rank;
 
-            var suit = (Suit)InputNumber(askSuit);
-            var rank = (Number)InputNumber(askRank);
+            do
+            {
+                suit = (Suit)InputNumber(askSuit);
+            } while (!Enum.IsDefined(typeof(Suit), suit));
+
+            do
+            {
+                rank = (Number)InputNumber(askRank);
+            } while (!Enum.IsDefined(typeof(Number), rank));
             
             Console.WriteLine("");
 
