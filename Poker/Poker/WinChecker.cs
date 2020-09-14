@@ -5,6 +5,20 @@ using System.Linq;
 
 namespace Poker
 {
+    public enum WinType
+    {
+        RoyalFlush,
+        StraightFlush,
+        FourOfAKind,
+        FullHouse,
+        Flush,
+        Straight,
+        ThreeOfAKind,
+        TwoPair,
+        Pair,
+        HighCard
+    }
+
     class WinChecker
     {
         public static bool WinCheck(List<Card> table, List<Card> playerHand, List<List<Card>> otherHands = null)
@@ -41,6 +55,26 @@ namespace Poker
             }
 
             return (hand, highestWin, kickers);
+        }
+        public static (List<List<Card>> Hands, WinType WinType) GetWinningHand(List<(List<Card> Hand, WinType WinType, List<Rank> Kickers)> highestWins)
+        {
+            if (!highestWins.Any()) return (null, WinType.HighCard);
+
+            highestWins = highestWins.GroupBy(x => x.WinType).OrderBy(x => x.Key).First().ToList();
+            if (highestWins.Count == 1) return highestWins.Select(x => (new List<List<Card>> { x.Hand }, x.WinType)).Single();
+            else
+            {
+                var kickerCount = highestWins.Max(x => x.Kickers.Count);
+                for (int i = 0; i < kickerCount; i++)
+                {
+                    var highestKicker = highestWins.Max(x => x.Kickers[i]);
+                    highestWins = highestWins.Where(x => x.Kickers[i] == highestKicker).ToList();
+
+                    if (highestWins.Count == 1) return highestWins.Select(x => (new List<List<Card>> { x.Hand }, x.WinType)).Single();
+                }
+            }
+
+            return (highestWins.Select(x => x.Hand).ToList(), highestWins.First().WinType);
         }
 
         public static (WinType HighestWin, List<Rank> Kickers) HighestNonComboWin(List<Card> pool)
@@ -81,27 +115,6 @@ namespace Poker
             }
 
             return (highestWin, kickers);
-        }
-
-        public static (List<List<Card>> Hands, WinType WinType) GetWinningHand(List<(List<Card> Hand, WinType WinType, List<Rank> Kickers)> highestWins)
-        {
-            if (!highestWins.Any()) return (null, WinType.HighCard);
-
-            highestWins = highestWins.GroupBy(x => x.WinType).OrderBy(x => x.Key).First().ToList();
-            if (highestWins.Count == 1) return highestWins.Select(x => (new List<List<Card>> { x.Hand }, x.WinType)).Single();
-            else
-            {
-                var kickerCount = highestWins.Max(x => x.Kickers.Count);
-                for (int i = 0; i < kickerCount; i++)
-                {
-                    var highestKicker = highestWins.Max(x => x.Kickers[i]);
-                    highestWins = highestWins.Where(x => x.Kickers[i] == highestKicker).ToList();
-
-                    if (highestWins.Count == 1) return highestWins.Select(x => (new List<List<Card>> { x.Hand }, x.WinType)).Single();
-                }
-            }
-
-            return (highestWins.Select(x => x.Hand).ToList(), highestWins.First().WinType);
         }
 
         private static (WinType WinType, List<Rank> Kickers) HighestComboWin(List<Card> pool)
@@ -184,19 +197,5 @@ namespace Poker
 
             return (false, pool.Max(x => x.Number));
         }
-    }
-
-    public enum WinType
-    {
-        RoyalFlush,
-        StraightFlush,
-        FourOfAKind,
-        FullHouse,
-        Flush,
-        Straight,
-        ThreeOfAKind,
-        TwoPair,
-        Pair,
-        HighCard
     }
 }
