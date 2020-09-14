@@ -28,10 +28,15 @@ namespace Poker
 
         public static double CalculateProbability(List<Card> Hand, int otherPlayers, int iterations = 1000)
         {
+            return CalculateProbability(Hand, new List<Card>(), otherPlayers, iterations);
+        }
+
+        public static double CalculateProbability(List<Card> Hand, List<Card> Table, int otherPlayers, int iterations = 1000)
+        {
             double total = 0;
             for(int i = 0; i < iterations; i++)
             {
-                if (SimulateRound(Hand, otherPlayers)) total++;
+                if (SimulateRound(Hand, Table, otherPlayers)) total++;
             }
 
             return total/iterations;
