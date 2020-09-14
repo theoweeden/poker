@@ -26,27 +26,35 @@ namespace Poker
             return output;
         }
 
-        public static double CalculateProbability(List<Card> Hand, int iterations = 1000)
+        public static double CalculateProbability(List<Card> Hand, int otherPlayers, int iterations = 1000)
         {
             double total = 0;
             for(int i = 0; i < iterations; i++)
             {
-                if (SimulateRound(Hand)) total++;
+                if (SimulateRound(Hand, otherPlayers)) total++;
             }
 
             return total/iterations;
         }
 
-        public static bool SimulateRound(List<Card> Hand)
+        public static bool SimulateRound(List<Card> Hand, int otherPlayers)
+        {
+            return SimulateRound(Hand, new List<Card>(), otherPlayers);
+        }
+
+        public static bool SimulateRound(List<Card> Hand, List<Card> Table, int otherPlayers)
         {
             var deck = new Deck();
 
             foreach (var c in Hand) deck.Remove(c);
+            foreach (var c in Table) deck.Remove(c);
 
             deck.Shuffle();
 
-            var table = deck.DealHand(5);
-            var hands = deck.DealHands(3, 2);
+            var table = new List<Card>(Table);
+
+            if (Table.Count < 5) table.AddRange(deck.DealHand(5 - Table.Count));
+            var hands = deck.DealHands(otherPlayers, 2);
             
             return WinChecker.WinCheck(table, Hand, hands);
         }

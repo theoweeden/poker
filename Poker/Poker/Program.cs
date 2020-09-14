@@ -10,22 +10,44 @@ namespace Poker
         {
             var hand = new List<Card>()
             {
-                new Card(Number.Ace, Suit.Diamonds),
-                new Card(Number.Ace, Suit.Hearts),
+                InputCard("Please give the details of your first card."),
+                InputCard("Please give the details of your second card."),
             };
 
-            var p = MonteCarlo.CalculateProbability(hand, 10000);
+            var p = MonteCarlo.CalculateProbability(hand, 3, 10000);
 
             Console.WriteLine(p);
+        }
 
+        static Card InputCard(string titleLine = null)
+        {
+            if (!string.IsNullOrEmpty(titleLine)) Console.WriteLine(titleLine);
+
+            int suit, rank;
+
+            do
+            {
+                Console.WriteLine("What Suit is the card?");
+            } while (!Int32.TryParse(Console.ReadLine(), out suit));
+            
+            do
+            {
+                Console.WriteLine("What Rank is the card?");
+            } while (!Int32.TryParse(Console.ReadLine(), out rank));
+
+            Console.WriteLine("");
+            return new Card((Number)rank, (Suit)suit);
+        }
+        
+        static void PrintToFile()
+        {
             var pp = MonteCarlo.CalculateAllProbabilities(100);
             using StreamWriter sw = new StreamWriter("results.csv");
-            foreach(var (h, r) in pp)
+            foreach (var (h, r) in pp)
             {
                 sw.WriteLine($"{h[0].ToString()}, {h[1].ToString()}, {r},");
             }
         }
-
         static void TestHand()
         {
             var table = new List<Card>()
