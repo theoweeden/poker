@@ -32,9 +32,11 @@ namespace Poker
                 InputCard("Please give the details of your second card."),
             };
 
+            foreach (var c in hand) Console.WriteLine(c);
+            Console.WriteLine("\nThinking...\n");
+
             var p = MonteCarlo.CalculateProbability(hand, otherPlayers, 10000);
 
-            foreach (var c in hand) Console.WriteLine(c);
             Console.WriteLine(p);
         }
 
