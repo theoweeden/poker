@@ -8,37 +8,9 @@ namespace Poker
     {
         static void Main(string[] args)
         {
-            var hand = new List<Card>()
-            {
-                InputCard("Please give the details of your first card."),
-                InputCard("Please give the details of your second card."),
-            };
-
-            var p = MonteCarlo.CalculateProbability(hand, 3, 10000);
-
-            Console.WriteLine(p);
+            UI.Run();
         }
 
-        static Card InputCard(string titleLine = null)
-        {
-            if (!string.IsNullOrEmpty(titleLine)) Console.WriteLine(titleLine);
-
-            int suit, rank;
-
-            do
-            {
-                Console.WriteLine("What Suit is the card?");
-            } while (!Int32.TryParse(Console.ReadLine(), out suit));
-            
-            do
-            {
-                Console.WriteLine("What Rank is the card?");
-            } while (!Int32.TryParse(Console.ReadLine(), out rank));
-
-            Console.WriteLine("");
-            return new Card((Number)rank, (Suit)suit);
-        }
-        
         static void PrintToFile()
         {
             var pp = MonteCarlo.CalculateAllProbabilities(100);
