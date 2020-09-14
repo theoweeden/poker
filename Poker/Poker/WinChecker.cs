@@ -31,9 +31,10 @@ namespace Poker
             var pool = new List<Card>(table);
             pool.AddRange(hand);
 
-            var potentialFlushes = pool.GroupBy(x => x.Suit).Where(x => x.Count() >= 5).Select(x => x.OrderByDescending(y => y.Number));
             var highestWin = WinType.HighCard;
             var kickers = new List<Rank>();
+
+            var potentialFlushes = pool.GroupBy(x => x.Suit).Where(x => x.Count() >= 5).Select(x => x.OrderByDescending(y => y.Number));
 
             if (potentialFlushes.Any())
             {
