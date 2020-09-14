@@ -53,7 +53,7 @@ namespace Poker
             Console.WriteLine("");
             
             Suit suit;
-            Number rank;
+            Rank rank;
 
             do
             {
@@ -62,8 +62,8 @@ namespace Poker
 
             do
             {
-                rank = (Number)InputNumber(askRank);
-            } while (!Enum.IsDefined(typeof(Number), rank));
+                rank = (Rank)InputNumber(askRank);
+            } while (!Enum.IsDefined(typeof(Rank), rank));
             
             Console.WriteLine("");
 

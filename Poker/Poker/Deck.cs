@@ -13,7 +13,7 @@ namespace Poker
             Cards = new Stack<Card>();
             foreach (var suit in (Suit[])Enum.GetValues(typeof(Suit)))
             {
-                foreach (var n in (Number[])Enum.GetValues(typeof(Number)))
+                foreach (var n in (Rank[])Enum.GetValues(typeof(Rank)))
                 {
                     Cards.Push(new Card(n, suit));
                 }

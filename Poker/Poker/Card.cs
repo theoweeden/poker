@@ -6,9 +6,9 @@ namespace Poker
 {
     class Card
     {
-        public Number Number { get; set; }
+        public Rank Number { get; set; }
         public Suit Suit { get; set; }
-        public Card(Number number, Suit suit)
+        public Card(Rank number, Suit suit)
         {
             Number = number;
             Suit = suit;
@@ -20,7 +20,7 @@ namespace Poker
         }
     }
 
-    public enum Number
+    public enum Rank
     {
         Two = 2,
         Three,

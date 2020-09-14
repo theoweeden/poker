@@ -24,19 +24,19 @@ namespace Poker
         {
             var table = new List<Card>()
             {
-                new Card(Number.Ace, Suit.Diamonds),
-                new Card(Number.Two, Suit.Diamonds),
-                new Card(Number.Queen, Suit.Diamonds),
-                new Card(Number.Three, Suit.Diamonds),
-                new Card(Number.Five, Suit.Diamonds),
+                new Card(Rank.Ace, Suit.Diamonds),
+                new Card(Rank.Two, Suit.Diamonds),
+                new Card(Rank.Queen, Suit.Diamonds),
+                new Card(Rank.Three, Suit.Diamonds),
+                new Card(Rank.Five, Suit.Diamonds),
             };
 
             var hands = new List<List<Card>>()
             {
                 new List<Card>()
                 {
-                    new Card(Number.Four, Suit.Diamonds),
-                    new Card(Number.Ten, Suit.Diamonds),
+                    new Card(Rank.Four, Suit.Diamonds),
+                    new Card(Rank.Ten, Suit.Diamonds),
                 }
             };
 

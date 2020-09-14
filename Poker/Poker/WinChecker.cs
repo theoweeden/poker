@@ -17,7 +17,7 @@ namespace Poker
 
         public static (List<List<Card>> Hands, WinType WinType) WinCheck(List<Card> table, List<List<Card>> hands)
         {
-            var highestWins = new List<(List<Card> Hand, WinType WinType, List<Number> Kickers)>();
+            var highestWins = new List<(List<Card> Hand, WinType WinType, List<Rank> Kickers)>();
             foreach(var hand in hands)
             {
                 var pool = new List<Card>(table);
@@ -25,25 +25,25 @@ namespace Poker
 
                 var potentialFlushes = pool.GroupBy(x => x.Suit).Where(x => x.Count() >= 5).Select(x => x.OrderByDescending(y=>y.Number));
                 var highestWin = WinType.HighCard;
-                var kickers = new List<Number>();
+                var kickers = new List<Rank>();
 
                 if (potentialFlushes.Any())
                 {
                     var straightChecks = potentialFlushes.Select(x => StraightCheck(x.ToList())).OrderByDescending(x => x.highestValue);
 
-                    if (straightChecks.Any(x => x.highestValue == Number.Ace && x.straight))
+                    if (straightChecks.Any(x => x.highestValue == Rank.Ace && x.straight))
                     {
                         highestWin = WinType.RoyalFlush;
-                        kickers = new List<Number> { Number.Ace };
+                        kickers = new List<Rank> { Rank.Ace };
                     }
                     else if (straightChecks.Any(x => x.straight))
                     {
                         highestWin = WinType.StraightFlush;
-                        kickers = new List<Number> { straightChecks.First(x => x.straight).highestValue };
+                        kickers = new List<Rank> { straightChecks.First(x => x.straight).highestValue };
                     }
                     else { 
                         highestWin = WinType.Flush;
-                        kickers = new List<Number> { potentialFlushes.First().First().Number };
+                        kickers = new List<Rank> { potentialFlushes.First().First().Number };
                     }
                 }
                 else
@@ -52,7 +52,7 @@ namespace Poker
                     if (straightCheck.straight)
                     {
                         highestWin = WinType.Straight;
-                        kickers = new List<Number> { straightCheck.highestValue };
+                        kickers = new List<Rank> { straightCheck.highestValue };
                     }
                 }
 
@@ -85,36 +85,36 @@ namespace Poker
             return (highestWins.Select(x => x.Hand).ToList(), highestWins.First().WinType);
         }
 
-        private static (WinType WinType, List<Number> Kickers) ComboCheck(List<Card> pool)
+        private static (WinType WinType, List<Rank> Kickers) ComboCheck(List<Card> pool)
         {
             var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderByDescending(x => x.count).ThenByDescending(x => x.Key);
 
-            Number? FirstCombo(int count)
+            Rank? FirstCombo(int count)
             {
                 if (!combos.Any(x => x.count >= count)) return null;
                 return combos.FirstOrDefault(x => x.count == count).Key;
             }
 
-            Number? SecondCombo(int count, Number exclude)
+            Rank? SecondCombo(int count, Rank exclude)
             {
                 if (!combos.Any(x => x.count >= count && x.Key != exclude)) return null;
                 return combos.FirstOrDefault(x => x.count == count && x.Key != exclude).Key;
             }
 
-            IEnumerable<Number> TakeFromPool(int count, Number exclude)
+            IEnumerable<Rank> TakeFromPool(int count, Rank exclude)
             {
                 return pool.Where(x => x.Number != exclude).Select(x => x.Number).OrderBy(x => x).Take(count);
             }
 
             if (FirstCombo(4).HasValue)
             {
-                var kickers = new List<Number> { FirstCombo(4).Value };
+                var kickers = new List<Rank> { FirstCombo(4).Value };
                 kickers.AddRange(TakeFromPool(1, kickers.First()));
                 return (WinType.FourOfAKind, kickers);
             }
             else if (FirstCombo(3).HasValue)
             {
-                var kickers = new List<Number> { FirstCombo(3).Value };
+                var kickers = new List<Rank> { FirstCombo(3).Value };
                 if (SecondCombo(2, kickers.First()).HasValue)
                 {
                     kickers.Add(SecondCombo(2, kickers.First()).Value);
@@ -128,7 +128,7 @@ namespace Poker
             }
             else if (FirstCombo(2).HasValue)
             {
-                var kickers = new List<Number> { FirstCombo(2).Value };
+                var kickers = new List<Rank> { FirstCombo(2).Value };
                 if (SecondCombo(2, kickers.First()).HasValue)
                 {
                     kickers.Add(SecondCombo(2, kickers.First()).Value);
@@ -145,7 +145,7 @@ namespace Poker
             return (WinType.HighCard, pool.OrderByDescending(x => x.Number).Select(x=>x.Number).Take(5).ToList());
         }
 
-        public static (bool straight, Number highestValue) StraightCheck(List<Card> pool)
+        public static (bool straight, Rank highestValue) StraightCheck(List<Card> pool)
         {
             var orderedPool = pool.GroupBy(x=>x.Number).OrderBy(x => x.Key).ToList();
             var diffs = orderedPool.Zip(orderedPool.Skip(1), (a, b) => (diff: b.Key - a.Key, number: b.Key)).ToList();
@@ -158,8 +158,8 @@ namespace Poker
                 return (diff, group);
             }).GroupBy(x => x.group).Select(x => (count: x.Count(), value: x.Last().diff.number)).OrderBy(x=>x.count).ToList();
 
-            if (straightLengths.Any(x => x.count >= 4 && x.value == Number.Five) && pool.Any(x => x.Number == Number.Ace)) 
-                return (true, Number.Five);
+            if (straightLengths.Any(x => x.count >= 4 && x.value == Rank.Five) && pool.Any(x => x.Number == Rank.Ace)) 
+                return (true, Rank.Five);
 
             if (straightLengths.Any(x => x.count >= 5)) return (true, straightLengths.Last(x => x.count >= 5).value);
 
