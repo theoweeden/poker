@@ -34,6 +34,7 @@ namespace Poker
 
             var p = MonteCarlo.CalculateProbability(hand, otherPlayers, 10000);
 
+            foreach (var c in hand) Console.WriteLine(c);
             Console.WriteLine(p);
         }
 
