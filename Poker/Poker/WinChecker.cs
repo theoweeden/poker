@@ -23,7 +23,7 @@ namespace Poker
                 highestWins.Add(GetHighestWin(table, hand));
             }
 
-            return GetWinningCard(highestWins);
+            return GetWinningHand(highestWins);
         }
 
         public static (List<Card> Hand, WinType WinType, List<Rank> Kickers) GetHighestWin(List<Card> table, List<Card> hand)
@@ -31,6 +31,20 @@ namespace Poker
             var pool = new List<Card>(table);
             pool.AddRange(hand);
 
+            var (highestWin, kickers) = HighestNonComboWin(pool);
+            var (highestCombo, comboKickers) = HighestComboWin(pool);
+
+            if (highestWin >= highestCombo)
+            {
+                highestWin = highestCombo;
+                kickers = comboKickers;
+            }
+
+            return (hand, highestWin, kickers);
+        }
+
+        public static (WinType HighestWin, List<Rank> Kickers) HighestNonComboWin(List<Card> pool)
+        {
             var highestWin = WinType.HighCard;
             var kickers = new List<Rank>();
 
@@ -66,17 +80,10 @@ namespace Poker
                 }
             }
 
-            var (highestCombo, comboKickers) = ComboCheck(pool);
-            if (highestWin >= highestCombo)
-            {
-                highestWin = highestCombo;
-                kickers = comboKickers;
-            }
-
-            return (hand, highestWin, kickers);
+            return (highestWin, kickers);
         }
 
-        public static (List<List<Card>> Hands, WinType WinType) GetWinningCard(List<(List<Card> Hand, WinType WinType, List<Rank> Kickers)> highestWins)
+        public static (List<List<Card>> Hands, WinType WinType) GetWinningHand(List<(List<Card> Hand, WinType WinType, List<Rank> Kickers)> highestWins)
         {
             if (!highestWins.Any()) return (null, WinType.HighCard);
 
@@ -97,7 +104,7 @@ namespace Poker
             return (highestWins.Select(x => x.Hand).ToList(), highestWins.First().WinType);
         }
 
-        private static (WinType WinType, List<Rank> Kickers) ComboCheck(List<Card> pool)
+        private static (WinType WinType, List<Rank> Kickers) HighestComboWin(List<Card> pool)
         {
             var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderByDescending(x => x.count).ThenByDescending(x => x.Key);
 
