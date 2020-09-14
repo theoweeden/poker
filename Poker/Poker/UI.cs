@@ -6,6 +6,21 @@ namespace Poker
 {
     class UI
     {
+        const string askSuit = "What Suit is the card?"
+                            + "\n{0}Clubs"
+                            + "\n{1}Diamonds"
+                            + "\n{2}Hearts"
+                            + "\n{3}Spades";
+
+        const string askRank = "What Rank is the card?"
+                            + "\n{2}Two"
+                            + "\n{3}Three"
+                            + "\n..."
+                            + "\n{10}Ten"
+                            + "\n{11}Jack"
+                            + "\n{12}Queen"
+                            + "\n{13}King"
+                            + "\n{14}Ace";
         public static void Run()
         {
             var otherPlayers = InputNumber("How many other players are there?");
@@ -37,8 +52,8 @@ namespace Poker
             if (!string.IsNullOrEmpty(titleLine)) Console.WriteLine(titleLine);
             Console.WriteLine("");
 
-            var suit = (Suit)InputNumber("What Suit is the card?");
-            var rank = (Number)InputNumber("What Rank is the card?");
+            var suit = (Suit)InputNumber(askSuit);
+            var rank = (Number)InputNumber(askRank);
             
             Console.WriteLine("");
 
