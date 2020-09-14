@@ -190,10 +190,10 @@ namespace Poker
                 return (diff, group);
             }).GroupBy(x => x.group).Select(x => (count: x.Count(), value: x.Last().diff.number)).OrderBy(x=>x.count).ToList();
 
+            if (straightLengths.Any(x => x.count >= 5)) return (true, straightLengths.Last(x => x.count >= 5).value);
+
             if (straightLengths.Any(x => x.count >= 4 && x.value == Rank.Five) && pool.Any(x => x.Number == Rank.Ace)) 
                 return (true, Rank.Five);
-
-            if (straightLengths.Any(x => x.count >= 5)) return (true, straightLengths.Last(x => x.count >= 5).value);
 
             return (false, pool.Max(x => x.Number));
         }
