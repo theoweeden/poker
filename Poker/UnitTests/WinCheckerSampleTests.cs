@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace UnitTests
 {
     [TestClass]
-    public class UnitTest1
+    public class WinCheckerSampleTests
     {
         [TestMethod]
         public void TestStraightFlush1()
