@@ -117,7 +117,7 @@ namespace Poker
             return (highestWin, kickers);
         }
 
-        private static (WinType WinType, List<Rank> Kickers) HighestComboWin(List<Card> pool)
+        public static (WinType WinType, List<Rank> Kickers) HighestComboWin(List<Card> pool)
         {
             var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderByDescending(x => x.count).ThenByDescending(x => x.Key);
 
