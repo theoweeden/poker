@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Poker
 {
-    class MonteCarlo
+    public class MonteCarlo
     {
         public static List<(List<Card> hand, double probability)> CalculateAllProbabilities(int iterations = 1000)
         {

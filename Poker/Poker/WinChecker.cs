@@ -19,7 +19,7 @@ namespace Poker
         HighCard
     }
 
-    class WinChecker
+    public class WinChecker
     {
         public static bool WinCheck(List<Card> table, List<Card> playerHand, List<List<Card>> otherHands = null)
         {

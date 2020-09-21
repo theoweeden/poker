@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Poker
 {
-    class Deck
+    public class Deck
     {
         public Stack<Card> Cards { get; set; }
         public Deck()
