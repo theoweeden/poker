@@ -129,7 +129,7 @@ namespace Poker
 
             IEnumerable<Rank> TakeFromPool(int count, List<Rank> exclude)
             {
-                return pool.Where(x => !exclude.Contains(x.Number)).Select(x => x.Number).OrderBy(x => x).Take(count);
+                return pool.Where(x => !exclude.Contains(x.Number)).Select(x => x.Number).OrderByDescending(x => x).Take(count);
             }
 
             if (GetCombo(4).HasValue)
