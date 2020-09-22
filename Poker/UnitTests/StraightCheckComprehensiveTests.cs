@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace UnitTests
 {
     [TestClass]
-    public class WinCheckerComprehensiveTests
+    public class StraightCheckComprehensiveTests
     {
         public void TestStraightCheck(int straightSize, bool assertTrue = true)
         {
