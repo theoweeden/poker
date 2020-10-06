@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Poker
 {
-    class UI
+    public class UI
     {
         const string askSuit = "What Suit is the card?"
                             + "\n{0}Clubs"

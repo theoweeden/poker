@@ -19,7 +19,7 @@ namespace Poker
         HighCard
     }
 
-    class WinChecker
+    public class WinChecker
     {
         public static bool WinCheck(List<Card> table, List<Card> playerHand, List<List<Card>> otherHands = null)
         {
@@ -117,7 +117,7 @@ namespace Poker
             return (highestWin, kickers);
         }
 
-        private static (WinType WinType, List<Rank> Kickers) HighestComboWin(List<Card> pool)
+        public static (WinType WinType, List<Rank> Kickers) HighestComboWin(List<Card> pool)
         {
             var combos = pool.GroupBy(x => x.Number).Select(x => (x.Key, count: x.Count())).OrderByDescending(x => x.count).ThenByDescending(x => x.Key);
 
@@ -129,7 +129,7 @@ namespace Poker
 
             IEnumerable<Rank> TakeFromPool(int count, List<Rank> exclude)
             {
-                return pool.Where(x => !exclude.Contains(x.Number)).Select(x => x.Number).OrderBy(x => x).Take(count);
+                return pool.Where(x => !exclude.Contains(x.Number)).Select(x => x.Number).OrderByDescending(x => x).Take(count);
             }
 
             if (GetCombo(4).HasValue)

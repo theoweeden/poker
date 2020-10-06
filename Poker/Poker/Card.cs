@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Poker
 {
-    class Card
+    public class Card
     {
         public Rank Number { get; set; }
         public Suit Suit { get; set; }
